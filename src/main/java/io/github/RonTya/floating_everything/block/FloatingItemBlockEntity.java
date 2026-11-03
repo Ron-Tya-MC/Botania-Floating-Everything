@@ -1,25 +1,36 @@
 package io.github.RonTya.floating_everything.block;
 
 import io.github.RonTya.floating_everything.BasicRegister;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
+import vazkii.botania.api.BotaniaAPIClient;
 import vazkii.botania.api.block.FloatingFlower;
 import vazkii.botania.api.block.FloatingFlowerImpl;
 import vazkii.botania.api.block.FloatingFlowerProvider;
+import vazkii.botania.api.block.WandHUD;
 import vazkii.botania.api.block_entity.FunctionalFlowerBlockEntity;
 import vazkii.botania.api.block_entity.RadiusDescriptor;
+import vazkii.botania.api.mana.ManaReceiver;
+import vazkii.botania.client.core.helper.RenderHelper;
 import vazkii.botania.common.annotations.SoftImplement;
 
-public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity implements FloatingFlowerProvider {
+public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity implements FloatingFlowerProvider, ManaReceiver {
     private ItemStack displayedItem = ItemStack.EMPTY;
     private int cooldown = 0;
     private int manaDebt = 0;
+    private int syncCooldown = 0;
     private static final int RANGE = 1;
+    private static final int MAX_SYNC_COOLDOWN = 20;
 
     public static final String TAG_DISPLAYED_ITEM = "displayed_item";
     public static final String TAG_COOLDOWN = "cooldown";
@@ -27,6 +38,7 @@ public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity impleme
     private static final String TAG_FLOATING_DATA = "floating";
 
     private final FloatingFlower floatingData = new FloatingFlowerImpl() {
+        @NotNull
         @Override
         public ItemStack getDisplayStack() {
             return displayedItem;
@@ -43,9 +55,18 @@ public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity impleme
     public void tickFlower() {
         super.tickFlower();
 
+        boolean reserveSync = false;
+
         if (!(level instanceof ServerLevel serverLevel) || displayedItem.isEmpty()) {
             return;
         }
+
+        if (syncCooldown > 0) syncCooldown--;
+        else {
+            reserveSync = true;
+            syncCooldown = MAX_SYNC_COOLDOWN;
+        }
+
         FloatingItemClicker.ClickAction action = FloatingItemClicker.getAction(getFloatingData().getIslandType());
         int interval = action.intervalTicks();
         if (action.click() != FloatingItemClicker.ClickType.LEFT) {
@@ -74,8 +95,10 @@ public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity impleme
                 int payment = Math.min(getMana(), extra);
                 addMana(-1 * payment);
                 manaDebt += extra - payment;
+                if (extra >= FloatingItemCost.DAMAGE_COST_RATE.get() / 2) reserveSync = true;
             }
             setChanged();
+            if (reserveSync) sync();
         }
         cooldown = interval - 1;
     }
@@ -92,7 +115,7 @@ public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity impleme
 
     @Override
     public int getColor() {
-        return displayedItem.isEmpty() ? 0xffffff : displayedItem.hashCode() % 0xffffff;
+        return displayedItem.isEmpty() ? 0xffffff : displayedItem.getItem().hashCode() % 0xffffff;
     }
 
     @Override
@@ -167,5 +190,77 @@ public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity impleme
     @SoftImplement("RenderDataBlockEntity")
     public Object getRenderData() {
         return floatingData.getIslandType();
+    }
+
+    @Override
+    public Level getManaReceiverLevel() {
+        return getLevel();
+    }
+
+    @Override
+    public BlockPos getManaReceiverPos() {
+        return getBlockPos();
+    }
+
+    @Override
+    public int getCurrentMana() {
+        return getMana();
+    }
+
+    @Override
+    public boolean isFull() {
+        return manaDebt == 0 && getMana() >= getMaxMana();
+    }
+
+    @Override
+    public void receiveMana(int amount) {
+        if (amount <= 0) {
+            return;
+        }
+        if (manaDebt > 0) {
+            int payment = Math.min(manaDebt, amount);
+            manaDebt -= payment;
+            amount -= payment;
+        }
+        addMana(amount);
+        setChanged();
+    }
+
+    @Override
+    public boolean canReceiveManaFromBursts() {
+        return true;
+    }
+
+    public static class FloatingItemWandHud implements WandHUD {
+        protected final FloatingItemBlockEntity flower;
+
+        public FloatingItemWandHud(FloatingItemBlockEntity flower) {
+            this.flower = flower;
+        }
+
+        public void renderHUD(GuiGraphics gui, Minecraft minecraft, int minLeft, int minRight, int minDown) {
+            ItemStack displayed = flower.getFloatingData().getDisplayStack();
+            String name = displayed.isEmpty() ? I18n.get(flower.getBlockState().getBlock().getDescriptionId() + ".empty")
+                    : I18n.get(flower.getBlockState().getBlock().getDescriptionId(), displayed.getHoverName().getString());
+            int color = flower.getColor();
+
+            int centerX = minecraft.getWindow().getGuiScaledWidth() / 2;
+            int centerY = minecraft.getWindow().getGuiScaledHeight() / 2;
+            int left = (Math.max(102, minecraft.font.width(name)) + 4) / 2;
+
+            int right = left + 20;
+
+            left = Math.max(left, minLeft);
+            right = Math.max(right, minRight);
+
+            RenderHelper.renderHUDBox(gui, centerX - left, centerY + 8, centerX + right, centerY + Math.max(30, minDown));
+
+            BotaniaAPIClient.instance().drawComplexManaHUD(gui, color, flower.getMana(), flower.getMaxMana(), name, flower.getHudIcon(), flower.isValidBinding());
+        }
+
+        @Override
+        public void renderHUD(GuiGraphics gui, Minecraft mc) {
+            renderHUD(gui, mc, 0, 0, 0);
+        }
     }
 }

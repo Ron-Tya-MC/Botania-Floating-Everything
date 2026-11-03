@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -20,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.registries.ForgeRegistries;
 import vazkii.botania.api.block.FloatingFlower.IslandType;
+import vazkii.botania.common.block.BotaniaBlocks;
 
 import java.util.*;
 
@@ -46,19 +48,29 @@ public class FloatingItemClicker {
         ACTIONS.put(IslandType.MUTATED, new ClickAction(1, ClickType.LEFT));
     }
 
+    public static final Block ABSTRUSE = BotaniaBlocks.abstrusePlatform;
+
     private FloatingItemClicker() {}
 
     public static ClickAction getAction(IslandType type) {
         return ACTIONS.getOrDefault(type, DEFAULT);
     }
 
-    public static BlockPos targetPos(BlockPos floatingPos) {
-        return floatingPos.below();
+    public static BlockPos targetPos(ServerLevel level, BlockPos floatingPos) {
+        if (!level.getBlockState(floatingPos.below()).is(ABSTRUSE)) return floatingPos.below();
+        if (!level.getBlockState(floatingPos.north()).is(ABSTRUSE)) return floatingPos.north();
+        if (!level.getBlockState(floatingPos.east()).is(ABSTRUSE)) return floatingPos.east();
+        if (!level.getBlockState(floatingPos.south()).is(ABSTRUSE)) return floatingPos.south();
+        if (!level.getBlockState(floatingPos.west()).is(ABSTRUSE)) return floatingPos.west();
+        if (!level.getBlockState(floatingPos.above()).is(ABSTRUSE)) return floatingPos.above();
+        return null;
     }
 
     public static ClickResult click(ServerLevel level, BlockPos floatingPos, ItemStack displayedStack, ClickType clickType, MiningProgress progress) {
         FloatingFakePlayer player = FloatingFakePlayer.get(level);
-        BlockPos target = targetPos(floatingPos);
+        BlockPos target = targetPos(level, floatingPos);
+        if (target == null) return new ClickResult(false, 0.0f);
+
         ItemStack heldStack = displayedStack.copyWithCount(1);
         ItemStack before = heldStack.copy();
         Multimap<Attribute, AttributeModifier> modifiers = heldStack.getAttributeModifiers(EquipmentSlot.MAINHAND);

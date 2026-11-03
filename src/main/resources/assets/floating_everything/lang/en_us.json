@@ -2,5 +2,6 @@
   "block.floating_everything.floating_item": "Floating %s",
   "block.floating_everything.floating_item.empty": "Floating Island",
   "item.floating_everything.example_item": "Any Item",
-  "item.floating_everything.example_item.tooltip": "Can be replaced with any items"
+  "item.floating_everything.example_item.tooltip": "Can be replaced with any items",
+  "config.jade.plugin_floating_everything.floating_item_name": "Floating Items' Displayed Name"
 }

@@ -74,7 +74,7 @@ dependencies {
     implementation fg.deobf("curse.maven:patchouli-306770:7731017")
 
     runtimeOnly fg.deobf("curse.maven:jei-238222:9352806")
-    runtimeOnly fg.deobf("curse.maven:jade-324717:8479276")
+    implementation fg.deobf("curse.maven:jade-324717:8479276")
 }
 
 tasks.named('processResources', ProcessResources).configure {

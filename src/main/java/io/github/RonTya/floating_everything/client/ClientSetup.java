@@ -1,5 +1,7 @@
-package io.github.RonTya.floating_everything;
+package io.github.RonTya.floating_everything.client;
 
+import io.github.RonTya.floating_everything.BasicRegister;
+import io.github.RonTya.floating_everything.FloatingEverything;
 import io.github.RonTya.floating_everything.block.FloatingItemBlockRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;

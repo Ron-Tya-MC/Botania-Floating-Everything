@@ -2,5 +2,6 @@
   "block.floating_everything.floating_item": "浮遊する%s",
   "block.floating_everything.floating_item.empty": "浮遊する島",
   "item.floating_everything.example_item": "任意のアイテム",
-  "item.floating_everything.example_item.tooltip": "任意のアイテムで置き換え可能"
+  "item.floating_everything.example_item.tooltip": "任意のアイテムで置き換え可能",
+  "config.jade.plugin_floating_everything.floating_item_name": "浮遊するアイテムの表示名"
 }
