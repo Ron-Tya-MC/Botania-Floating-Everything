@@ -17,6 +17,16 @@
                   "source": "displayed_item",
                   "target": "BlockEntityTag.displayed_item",
                   "op": "replace"
+                },
+                {
+                  "source": "cooldown",
+                  "target": "BlockEntityTag.cooldown",
+                  "op": "replace"
+                },
+                {
+                  "source": "mana_debt",
+                  "target": "BlockEntityTag.mana_debt",
+                  "op": "replace"
                 }
               ]
             }

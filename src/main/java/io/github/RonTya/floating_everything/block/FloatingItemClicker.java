@@ -56,11 +56,15 @@ public class FloatingItemClicker {
         return floatingPos.below();
     }
 
-    public static void click(ServerLevel level, BlockPos floatingPos, ItemStack displayedStack, ClickType clickType, MiningProgress progress) {
+    public static ClickResult click(ServerLevel level, BlockPos floatingPos, ItemStack displayedStack, ClickType clickType, MiningProgress progress) {
         FloatingFakePlayer player = FloatingFakePlayer.get(level);
         BlockPos target = targetPos(floatingPos);
         ItemStack heldStack = displayedStack.copyWithCount(1);
+        ItemStack before = heldStack.copy();
         Multimap<Attribute, AttributeModifier> modifiers = heldStack.getAttributeModifiers(EquipmentSlot.MAINHAND);
+
+        boolean succeeded = false;
+        float consumedProportion = 0.0f;
 
         try {
             player.moveTo(floatingPos.getX() + 0.5, floatingPos.getY(), floatingPos.getZ() + 0.5, 0.0F, 90.0F);
@@ -71,12 +75,17 @@ public class FloatingItemClicker {
             player.getAttributes().addTransientAttributeModifiers(modifiers);
 
             if (clickType == ClickType.LEFT) {
-                leftClick(level, player, target, progress);
+                succeeded = leftClick(level, player, target, progress);
             } else {
-                rightClick(level, player, target, heldStack);
+                succeeded = rightClick(level, player, target, heldStack);
+            }
+            if (succeeded) {
+                consumedProportion = getConsumption(before, player.getItemInHand(InteractionHand.MAIN_HAND));
             }
         } catch (Exception e) {
             FloatingEverything.LOGGER.error("[Botania: Floating Everything] Floating item action failed for {}", ForgeRegistries.ITEMS.getKey(displayedStack.getItem()), e);
+            succeeded = false;
+            consumedProportion = 0.0f;
         } finally {
             closeOpenedContainer(player);
             player.getAttributes().removeAttributeModifiers(modifiers);
@@ -85,35 +94,50 @@ public class FloatingItemClicker {
             player.getInventory().clearContent();
             player.getCooldowns().removeCooldown(displayedStack.getItem());
         }
+        return new ClickResult(succeeded, consumedProportion);
     }
 
-    private static void rightClick(ServerLevel level, FloatingFakePlayer player, BlockPos target, ItemStack held) {
+    private static float getConsumption(ItemStack before, ItemStack after) {
+        FloatingEverything.LOGGER.info("{}, {}", before.getDamageValue(), after.getDamageValue());
+
+        if (before.isEmpty()) return 0.0f;
+        if (after.isEmpty() || after.getItem() != before.getItem()) {
+            return 1.0f;
+        }
+        if (after.getCount() < before.getCount()) {
+            return 1.0f;
+        }
+        if (after.isDamageableItem() && after.getDamageValue() > before.getDamageValue()) {
+            int maxDamage = after.getMaxDamage();
+            int damage = after.getDamageValue() - before.getDamageValue();
+            return (float) damage / maxDamage;
+        }
+        return 0.0f;
+    }
+
+    private static boolean rightClick(ServerLevel level, FloatingFakePlayer player, BlockPos target, ItemStack held) {
         Entity entity = findTargetEntity(level, target, false);
         if (entity != null) {
-            player.interactOn(entity, InteractionHand.MAIN_HAND);
-            return;
+            return player.interactOn(entity, InteractionHand.MAIN_HAND).consumesAction();
         }
         Vec3 hitPos = new Vec3(target.getX() + 0.5, target.getY() + 1.0, target.getZ() + 0.5);
         BlockHitResult hit = new BlockHitResult(hitPos, Direction.UP, target, false);
-        player.gameMode.useItemOn(player, level, held, InteractionHand.MAIN_HAND, hit);
+        return player.gameMode.useItemOn(player, level, held, InteractionHand.MAIN_HAND, hit).consumesAction();
     }
 
-    private static void leftClick(ServerLevel level, FloatingFakePlayer player, BlockPos target, MiningProgress miningProgress) {
-        if (player.attackAnim == 0.0) player.swing(InteractionHand.MAIN_HAND);
-        FloatingEverything.LOGGER.info("{}", player.attackAnim);
-
+    private static boolean leftClick(ServerLevel level, FloatingFakePlayer player, BlockPos target, MiningProgress miningProgress) {
         Entity entity = findTargetEntity(level, target, true);
         if (entity != null) {
             clearCrack(level, player, target, miningProgress);
             player.refreshAttackStrength();
             player.attack(entity);
-            return;
+            return true;
         }
 
         BlockState state = level.getBlockState(target);
         if (state.isAir()) {
             clearCrack(level, player, target, miningProgress);
-            return;
+            return false;
         }
 
         if (miningProgress.state != state) {
@@ -123,7 +147,7 @@ public class FloatingItemClicker {
 
         float step = state.getDestroyProgress(player, level, target);
         if (step <= 0.0f) {
-            return;
+            return false;
         }
         miningProgress.progress += step;
         if (miningProgress.progress >= 1.0f) {
@@ -132,6 +156,7 @@ public class FloatingItemClicker {
         } else {
             level.destroyBlockProgress(player.getId(), target, (int) (miningProgress.progress * 10.0F));
         }
+        return true;
     }
 
     private static Entity findTargetEntity(ServerLevel level, BlockPos target, boolean onlyAttackable) {
@@ -169,6 +194,8 @@ public class FloatingItemClicker {
     }
 
     public record ClickAction(int intervalTicks, ClickType click) {}
+
+    public record ClickResult(boolean succeeded, float consumedProportion) {}
 
     public static final class MiningProgress {
         private BlockState state;
