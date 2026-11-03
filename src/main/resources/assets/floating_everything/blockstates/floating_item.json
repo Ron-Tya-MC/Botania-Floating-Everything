@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "floating_everything:block/floating_item"
+    }
+  }
+}
