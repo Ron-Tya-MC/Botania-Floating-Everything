@@ -98,8 +98,6 @@ public class FloatingItemClicker {
     }
 
     private static float getConsumption(ItemStack before, ItemStack after) {
-        FloatingEverything.LOGGER.info("{}, {}", before.getDamageValue(), after.getDamageValue());
-
         if (before.isEmpty()) return 0.0f;
         if (after.isEmpty() || after.getItem() != before.getItem()) {
             return 1.0f;

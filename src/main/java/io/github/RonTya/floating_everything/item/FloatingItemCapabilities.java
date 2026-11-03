@@ -21,19 +21,19 @@ public class FloatingItemCapabilities {
 
     private FloatingItemCapabilities() {}
 
-    @SubscribeEvent
-    public static void attachToBlockEntity(AttachCapabilitiesEvent<BlockEntity> event) {
-        if (!(event.getObject() instanceof FloatingItemBlockEntity be)) {
-            return;
-        }
-        LazyOptional<ManaReceiver> receiver = LazyOptional.of(() -> be);
-        event.addCapability(MANA_RECEIVER_ID, new ICapabilityProvider() {
-            @NotNull
-            @Override
-            public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, Direction side) {
-                return BotaniaForgeCapabilities.MANA_RECEIVER.orEmpty(cap, receiver);
-            }
-        });
-        event.addListener(receiver::invalidate);
-    }
+//    @SubscribeEvent
+//    public static void attachToBlockEntity(AttachCapabilitiesEvent<BlockEntity> event) {
+//        if (!(event.getObject() instanceof FloatingItemBlockEntity be)) {
+//            return;
+//        }
+//        LazyOptional<ManaReceiver> receiver = LazyOptional.of(() -> be);
+//        event.addCapability(MANA_RECEIVER_ID, new ICapabilityProvider() {
+//            @NotNull
+//            @Override
+//            public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, Direction side) {
+//                return BotaniaForgeCapabilities.MANA_RECEIVER.orEmpty(cap, receiver);
+//            }
+//        });
+//        event.addListener(receiver::invalidate);
+//    }
 }

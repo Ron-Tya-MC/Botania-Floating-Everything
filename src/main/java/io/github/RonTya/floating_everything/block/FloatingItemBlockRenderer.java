@@ -27,7 +27,7 @@ public class FloatingItemBlockRenderer implements BlockEntityRenderer<FloatingIt
                        @NotNull MultiBufferSource buffers, int packedLight, int packedOverlay) {
         FloatingFlowerBlockEntityRenderer.renderFloatingIsland(be, partialTick, poseStack, buffers, packedOverlay);
 
-        ItemStack stack = be.getDisplayedItem();
+        ItemStack stack = be.getFloatingData().getDisplayStack();
         if (stack.isEmpty()) return;
 
         poseStack.pushPose();

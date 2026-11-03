@@ -7,51 +7,42 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
-import vazkii.botania.api.mana.ManaReceiver;
-import vazkii.botania.common.block.block_entity.FloatingFlowerBlockEntity;
+import vazkii.botania.api.block.FloatingFlower;
+import vazkii.botania.api.block.FloatingFlowerImpl;
+import vazkii.botania.api.block.FloatingFlowerProvider;
+import vazkii.botania.api.block_entity.FunctionalFlowerBlockEntity;
+import vazkii.botania.api.block_entity.RadiusDescriptor;
+import vazkii.botania.common.annotations.SoftImplement;
 
-public class FloatingItemBlockEntity extends FloatingFlowerBlockEntity implements ManaReceiver {
+public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity implements FloatingFlowerProvider {
     private ItemStack displayedItem = ItemStack.EMPTY;
     private int cooldown = 0;
-    private int mana = 0;
     private int manaDebt = 0;
-    private final static int MAX_MANA = 4000;
+    private static final int RANGE = 1;
 
     public static final String TAG_DISPLAYED_ITEM = "displayed_item";
     public static final String TAG_COOLDOWN = "cooldown";
-    public static final String TAG_MANA = "mana";
     public static final String TAG_MANA_DEBT = "mana_debt";
+    private static final String TAG_FLOATING_DATA = "floating";
+
+    private final FloatingFlower floatingData = new FloatingFlowerImpl() {
+        @Override
+        public ItemStack getDisplayStack() {
+            return displayedItem;
+        }
+    };
 
     private final FloatingItemClicker.MiningProgress progress = new FloatingItemClicker.MiningProgress();
 
     public FloatingItemBlockEntity(BlockPos pos, BlockState state) {
-        super(pos, state);
+        super(BasicRegister.FLOATING_ITEM_BE.get(), pos, state);
     }
 
-    @NotNull
     @Override
-    public BlockEntityType<?> getType() {
-        return BasicRegister.FLOATING_ITEM_BE.get();
-    }
+    public void tickFlower() {
+        super.tickFlower();
 
-    public ItemStack getDisplayedItem() {
-        return displayedItem;
-    }
-
-    public void setDisplayedItem(ItemStack stack) {
-        this.displayedItem = stack.copyWithCount(1);
-        setChanged();
-        if (level != null && !level.isClientSide) {
-            BlockState state = getBlockState();
-            level.sendBlockUpdated(worldPosition, state, state, 3);
-        }
-    }
-
-    public void serverTick() {
         if (!(level instanceof ServerLevel serverLevel) || displayedItem.isEmpty()) {
             return;
         }
@@ -68,7 +59,7 @@ public class FloatingItemBlockEntity extends FloatingFlowerBlockEntity implement
             cooldown--;
             return;
         }
-        if (manaDebt > 0 || mana < FloatingItemCost.BASE_COST.get()) {
+        if (manaDebt > 0 || getMana() < FloatingItemCost.BASE_COST.get()) {
             return;
         }
         if (!serverLevel.getChunkSource().hasChunk(worldPosition.getX() >> 4, worldPosition.getZ() >> 4)) {
@@ -77,16 +68,36 @@ public class FloatingItemBlockEntity extends FloatingFlowerBlockEntity implement
 
         FloatingItemClicker.ClickResult result = FloatingItemClicker.click(serverLevel, worldPosition, displayedItem, action.click(), progress);
         if (result.succeeded()) {
-            mana -= FloatingItemCost.BASE_COST.get();
+            addMana(-1 * FloatingItemCost.BASE_COST.get());
             if (result.consumedProportion() > 0.0f) {
                 int extra = result.consumedProportion() >= 1.0f ? FloatingItemCost.CONSUME_COST.get() : Mth.floor(FloatingItemCost.DAMAGE_COST_RATE.get() * result.consumedProportion());
-                int payment = Math.min(mana, extra);
-                mana -= payment;
+                int payment = Math.min(getMana(), extra);
+                addMana(-1 * payment);
                 manaDebt += extra - payment;
             }
             setChanged();
         }
         cooldown = interval - 1;
+    }
+
+    @Override
+    public boolean acceptsRedstone() {
+        return true;
+    }
+
+    @Override
+    public int getMaxMana() {
+        return 4000;
+    }
+
+    @Override
+    public int getColor() {
+        return displayedItem.isEmpty() ? 0xffffff : displayedItem.hashCode() % 0xffffff;
+    }
+
+    @Override
+    public RadiusDescriptor getRadius() {
+        return RadiusDescriptor.Rectangle.square(getEffectivePos(), RANGE);
     }
 
     public CompoundTag createItemData() {
@@ -104,25 +115,32 @@ public class FloatingItemBlockEntity extends FloatingFlowerBlockEntity implement
     }
 
     @Override
-    public void writePacketNBT(CompoundTag tag) {
-        super.writePacketNBT(tag);
+    public void writeToPacketNBT(CompoundTag tag) {
+        super.writeToPacketNBT(tag);
+
         if (!displayedItem.isEmpty()) tag.put(TAG_DISPLAYED_ITEM, displayedItem.save(new CompoundTag()));
         tag.putInt(TAG_COOLDOWN, Math.max(cooldown, 0));
-        tag.putInt(TAG_MANA, Math.max(mana, 0));
         tag.putInt(TAG_MANA_DEBT, Math.max(manaDebt, 0));
+        tag.put(TAG_FLOATING_DATA, floatingData.writeNBT());
     }
 
     @Override
-    public void readPacketNBT(CompoundTag tag) {
-        super.readPacketNBT(tag);
+    public void readFromPacketNBT(CompoundTag tag) {
+        super.readFromPacketNBT(tag);
+
         if (tag.contains(TAG_DISPLAYED_ITEM, Tag.TAG_COMPOUND)) displayedItem = ItemStack.of(tag.getCompound(TAG_DISPLAYED_ITEM)).copyWithCount(1);
         else displayedItem = ItemStack.EMPTY;
 
         cooldown = tag.getInt(TAG_COOLDOWN);
-        mana = tag.getInt(TAG_MANA);
         manaDebt = tag.getInt(TAG_MANA_DEBT);
 
         progress.clear();
+
+        FloatingFlower.IslandType oldType = floatingData.getIslandType();
+        floatingData.readNBT(tag.getCompound(TAG_FLOATING_DATA));
+        if (oldType != floatingData.getIslandType() && level != null && level.isClientSide) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 0);
+        }
     }
 
     private enum FloatingItemCost {
@@ -142,41 +160,12 @@ public class FloatingItemBlockEntity extends FloatingFlowerBlockEntity implement
     }
 
     @Override
-    public Level getManaReceiverLevel() {
-        return getLevel();
+    public FloatingFlower getFloatingData() {
+        return floatingData;
     }
 
-    @Override
-    public BlockPos getManaReceiverPos() {
-        return getBlockPos();
-    }
-
-    @Override
-    public int getCurrentMana() {
-        return mana;
-    }
-
-    @Override
-    public boolean isFull() {
-        return manaDebt == 0 && mana >= MAX_MANA;
-    }
-
-    @Override
-    public void receiveMana(int amount) {
-        if (amount <= 0) {
-            return;
-        }
-        if (manaDebt > 0) {
-            int payment = Math.min(manaDebt, amount);
-            manaDebt -= payment;
-            amount -= payment;
-        }
-        mana = Math.min(MAX_MANA, mana + amount);
-        setChanged();
-    }
-
-    @Override
-    public boolean canReceiveManaFromBursts() {
-        return true;
+    @SoftImplement("RenderDataBlockEntity")
+    public Object getRenderData() {
+        return floatingData.getIslandType();
     }
 }
