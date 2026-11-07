@@ -228,37 +228,4 @@ public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity impleme
     public boolean canReceiveManaFromBursts() {
         return true;
     }
-
-    public static class FloatingItemWandHud implements WandHUD {
-        protected final FloatingItemBlockEntity flower;
-
-        public FloatingItemWandHud(FloatingItemBlockEntity flower) {
-            this.flower = flower;
-        }
-
-        public void renderHUD(GuiGraphics gui, Minecraft minecraft, int minLeft, int minRight, int minDown) {
-            ItemStack displayed = flower.getFloatingData().getDisplayStack();
-            String name = displayed.isEmpty() ? I18n.get(flower.getBlockState().getBlock().getDescriptionId() + ".empty")
-                    : I18n.get(flower.getBlockState().getBlock().getDescriptionId(), displayed.getHoverName().getString());
-            int color = flower.getColor();
-
-            int centerX = minecraft.getWindow().getGuiScaledWidth() / 2;
-            int centerY = minecraft.getWindow().getGuiScaledHeight() / 2;
-            int left = (Math.max(102, minecraft.font.width(name)) + 4) / 2;
-
-            int right = left + 20;
-
-            left = Math.max(left, minLeft);
-            right = Math.max(right, minRight);
-
-            RenderHelper.renderHUDBox(gui, centerX - left, centerY + 8, centerX + right, centerY + Math.max(30, minDown));
-
-            BotaniaAPIClient.instance().drawComplexManaHUD(gui, color, flower.getMana(), flower.getMaxMana(), name, flower.getHudIcon(), flower.isValidBinding());
-        }
-
-        @Override
-        public void renderHUD(GuiGraphics gui, Minecraft mc) {
-            renderHUD(gui, mc, 0, 0, 0);
-        }
-    }
 }

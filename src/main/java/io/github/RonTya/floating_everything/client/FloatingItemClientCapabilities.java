@@ -27,8 +27,7 @@ public class FloatingItemClientCapabilities {
         if (!(event.getObject() instanceof FloatingItemBlockEntity be)) {
             return;
         }
-        LazyOptional<WandHUD> hud = LazyOptional.of(
-                () -> new FloatingItemBlockEntity.FloatingItemWandHud(be));
+        LazyOptional<WandHUD> hud = LazyOptional.of(() -> new FloatingItemWandHud(be));
         event.addCapability(WAND_HUD_ID, new ICapabilityProvider() {
             @NotNull
             @Override
