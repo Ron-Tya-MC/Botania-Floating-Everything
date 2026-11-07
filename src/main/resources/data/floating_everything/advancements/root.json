@@ -1,0 +1,27 @@
+{
+    "criteria": {
+        "tick": {
+            "trigger": "minecraft:tick"
+        }
+    },
+    "display": {
+        "announce_to_chat": false,
+        "background": "botania:textures/block/vivid_grass_top.png",
+        "description": {
+            "translate": "advancement.floating_everything.root.desc"
+        },
+        "icon": {
+            "count": 1,
+            "item": "botania:white_floating_flower"
+        },
+        "show_toast": false,
+        "title": {
+            "translate": "advancement.floating_everything.root"
+        }
+    },
+    "requirements": [
+        [
+            "tick"
+        ]
+    ]
+}

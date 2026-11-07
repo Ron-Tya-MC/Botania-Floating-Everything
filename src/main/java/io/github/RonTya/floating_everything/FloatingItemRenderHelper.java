@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,6 +27,10 @@ public class FloatingItemRenderHelper {
         if (stack.is(BasicRegister.FLOATING_ITEM_ITEM.get()) || stack.is(BotaniaTags.Items.FLOATING_FLOWERS)) {
             itemScale = 1.5f;
             yOffSet = 0.9f;
+        }
+        else if (stack.getItem() instanceof BlockItem) {
+            itemScale = 0.75f;
+            yOffSet = 0.75f;
         }
         else {
             yOffSet = 0.76f;

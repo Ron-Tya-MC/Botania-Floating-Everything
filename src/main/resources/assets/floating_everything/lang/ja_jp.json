@@ -3,5 +3,25 @@
   "block.floating_everything.floating_item.empty": "浮遊する島",
   "item.floating_everything.example_item": "任意のアイテム",
   "item.floating_everything.example_item.tooltip": "任意のアイテムで置き換え可能",
-  "config.jade.plugin_floating_everything.floating_item_name": "浮遊するアイテムの表示名"
+  "config.jade.plugin_floating_everything.floating_item_name": "浮遊するアイテムの表示名",
+
+  "advancement.floating_everything.root": "Botania: Floating Everything",
+  "advancement.floating_everything.root.desc": "上級ボタニストのための暇つぶし",
+  "advancement.floating_everything.floating_item": "フロートプレイ",
+  "advancement.floating_everything.floating_item.desc": "浮遊するアイテムを手に入れる",
+  "advancement.floating_everything.floating_floating": "マトリョシカ",
+  "advancement.floating_everything.floating_floating.desc": "浮遊するアイテムを浮遊させる",
+  "advancement.floating_everything.floating_potato": "異星にいこうね",
+  "advancement.floating_everything.floating_potato.desc": "小さなポテトを浮遊させる",
+  "advancement.floating_everything.floating_hourglass": "トオトロジイダウトフル",
+  "advancement.floating_everything.floating_hourglass.desc": "浮遊している砂時計を浮遊させる",
+
+  "floating_everything.entry.floatingItems":  "浮遊するアイテム",
+  "botania.page.floatingItems0": "好きなアイテム8個を$(l:misc/shiny_flowers)$(item)浮遊する神秘の花$(0)$(/l)と$(item)レッドストーンの根$(0)とともに$(l:basics/rune_altar)$(item)ルーンの祭壇$(0)$(/l)に放り込み、そこそこの量の$(thing)マナ$(0)を流しこむことで、神秘の花の代わりにあらゆるアイテムを$(thing)浮遊させる$(0)ことができます。$(p)通常の$(l:misc/shiny_flowers)$(item)浮遊する花$(0)$(/l)と同様に、$(l:tools/grass_seeds)$(item)牧草の種$(0)$(/l)や$(item)雪玉$(0)で右クリックすると見た目を変化させられます。",
+  "botania.page.floatingItems1": "$(item)浮遊するアイテム$(0)はただ浮遊しているだけではありません。$(item)機能を持つ花$(0)と同様に近くの$(l:mana/pool)$(item)マナプール$(0)$(/l)から$(thing)マナ$(0)を吸い上げ、保持しているアイテムのクリック動作を模倣します。$(p)例えばブロックを置いたり、剣で敵を攻撃したり、$(item)小さなポテト$(0)をなでたりなどです。$(p)クリック1回ごとに$(thing)マナ$(0)を消費します。",
+  "botania.page.floatingItems2": "$(item)浮遊するアイテム$(0)に保持されているアイテムは消費されませんが、代わりに$(thing)マナ$(0)を使ってその状態を保っています。$(p)例えば持っている剣が傷ついたりすれば、追加の$(thing)マナ$(0)を支払うことになります。さらに、壊れたりなどでアイテムが完全になくなってしまうと、さらに多くの$(thing)マナ$(0)を支払う必要があります。$(p)これらの追加の$(thing)マナ$(0)は事前にためておく必要はありませんが、払い終えるまで次の動作はスキップされます。",
+  "botania.page.floatingItems3": "浮遊するアイテム",
+  "botania.page.floatingItems4": "$(item)浮遊するアイテム$(0)が模倣するクリックの種類と間隔は、土の種類によって異なります。$(p)$(li)雪: 40tick毎 右クリック$(li)草地: 20tick毎 右クリック$(li)ポドゾル: 20tick毎 スニーク右クリック$(li)菌糸: 20tick毎 左クリック$(li)乾燥: 10tick毎 右クリック$(li)金色: 10tick毎 スニーク右クリック$(li)鮮やか: 10tick毎 左クリック",
+  "botania.page.floatingItems5": "$(li)枯れた: 1tick毎 右クリック$(li)マナ: 1tick毎 スニーク右クリック$(li)変異: 1tick毎 左クリック$(p)また、レッドストーン信号を送ることでクリック動作を止められます。",
+  "botania.page.floatingItems6": "$(item)浮遊するアイテム$(0)は基本的に真下をクリックしようとしますが、$(l:devices/platform)$(item)難解なプラットフォーム$(0)$(/l)が置いてあるブロックはクリックできません。$(p)真下に$(l:devices/platform)$(item)難解なプラットフォーム$(0)$(/l)があれば次は北、そこにもあれば東、同様に南、西、真上の順に試し、全方向にある場合はクリック自体を諦めます。"
 }

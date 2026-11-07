@@ -17,6 +17,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import vazkii.botania.api.recipe.RunicAltarRecipe;
 import vazkii.botania.common.block.BotaniaBlocks;
+import vazkii.botania.common.item.BotaniaItems;
 import vazkii.botania.common.lib.BotaniaTags;
 
 import java.util.ArrayList;
@@ -50,7 +51,7 @@ public class FloatingItemRecipe implements RunicAltarRecipe {
                 stacks.add(stack);
             }
         }
-        if (stacks.size() != NEEDED_ITEMS + 1) {
+        if (stacks.size() != NEEDED_ITEMS + 2) {
             return ItemStack.EMPTY;
         }
 
@@ -58,23 +59,28 @@ public class FloatingItemRecipe implements RunicAltarRecipe {
             if (!stacks.get(flower).is(BotaniaTags.Items.MUNDANE_FLOATING_FLOWERS)) {
                 continue;
             }
-            ItemStack candidate = ItemStack.EMPTY;
-            boolean allSame = true;
-            for (int i = 0; i < stacks.size(); i++) {
-                if (i == flower) {
+            for (int redstone = 0; redstone < stacks.size(); redstone++) {
+                if (redstone == flower || !stacks.get(redstone).is(BotaniaItems.redstoneRoot)) {
                     continue;
                 }
-                ItemStack stack = stacks.get(i);
-                if (candidate.isEmpty()) {
-                    candidate = stack;
+
+                ItemStack candidate = ItemStack.EMPTY;
+                boolean allSame = true;
+                for (int i = 0; i < stacks.size(); i++) {
+                    if (i == flower || i == redstone) {
+                        continue;
+                    }
+                    ItemStack stack = stacks.get(i);
+                    if (candidate.isEmpty()) {
+                        candidate = stack;
+                    } else if (!ItemStack.isSameItemSameTags(candidate, stack)) {
+                        allSame = false;
+                        break;
+                    }
                 }
-                else if (!ItemStack.isSameItemSameTags(candidate, stack)) {
-                    allSame = false;
-                    break;
+                if (allSame) {
+                    return candidate;
                 }
-            }
-            if (allSame) {
-                return candidate;
             }
         }
         return ItemStack.EMPTY;
@@ -105,6 +111,7 @@ public class FloatingItemRecipe implements RunicAltarRecipe {
     private static NonNullList<Ingredient> makeIngredients() {
         NonNullList<Ingredient> list = NonNullList.create();
         list.add(Ingredient.of(BotaniaTags.Items.MUNDANE_FLOATING_FLOWERS));
+        list.add(Ingredient.of(BotaniaItems.redstoneRoot));
         for (int i = 0; i < NEEDED_ITEMS; i++) list.add(Ingredient.of(BasicRegister.EXAMPLE_ITEM.get()));
         return list;
     }

@@ -16,7 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import vazkii.botania.api.BotaniaAPIClient;
 import vazkii.botania.api.block.FloatingFlower;
 import vazkii.botania.api.block.FloatingFlowerImpl;
-import vazkii.botania.api.block.FloatingFlowerProvider;
 import vazkii.botania.api.block.WandHUD;
 import vazkii.botania.api.block_entity.FunctionalFlowerBlockEntity;
 import vazkii.botania.api.block_entity.RadiusDescriptor;
@@ -24,7 +23,7 @@ import vazkii.botania.api.mana.ManaReceiver;
 import vazkii.botania.client.core.helper.RenderHelper;
 import vazkii.botania.common.annotations.SoftImplement;
 
-public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity implements FloatingFlowerProvider, ManaReceiver {
+public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity implements ManaReceiver {
     private ItemStack displayedItem = ItemStack.EMPTY;
     private int cooldown = 0;
     private int manaDebt = 0;
@@ -49,6 +48,8 @@ public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity impleme
 
     public FloatingItemBlockEntity(BlockPos pos, BlockState state) {
         super(BasicRegister.FLOATING_ITEM_BE.get(), pos, state);
+
+        setFloating(true);
     }
 
     @Override
@@ -80,12 +81,9 @@ public class FloatingItemBlockEntity extends FunctionalFlowerBlockEntity impleme
             cooldown--;
             return;
         }
-        if (manaDebt > 0 || getMana() < FloatingItemCost.BASE_COST.get()) {
-            return;
-        }
-        if (!serverLevel.getChunkSource().hasChunk(worldPosition.getX() >> 4, worldPosition.getZ() >> 4)) {
-            return;
-        }
+        if (manaDebt > 0 || getMana() < FloatingItemCost.BASE_COST.get()) return;
+        if (redstoneSignal != 0) return;
+        if (!serverLevel.getChunkSource().hasChunk(worldPosition.getX() >> 4, worldPosition.getZ() >> 4)) return;
 
         FloatingItemClicker.ClickResult result = FloatingItemClicker.click(serverLevel, worldPosition, displayedItem, action.click(), progress);
         if (result.succeeded()) {

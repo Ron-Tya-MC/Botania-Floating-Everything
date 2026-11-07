@@ -3,5 +3,25 @@
   "block.floating_everything.floating_item.empty": "Floating Island",
   "item.floating_everything.example_item": "Any Item",
   "item.floating_everything.example_item.tooltip": "Can be replaced with any items",
-  "config.jade.plugin_floating_everything.floating_item_name": "Floating Items' Displayed Name"
+  "config.jade.plugin_floating_everything.floating_item_name": "Floating Items' Displayed Name",
+
+  "advancement.floating_everything.root": "Botania: Floating Everything",
+  "advancement.floating_everything.root.desc": "A pastime for the advanced botanist",
+  "advancement.floating_everything.floating_item": "Float Play",
+  "advancement.floating_everything.floating_item.desc": "Obtain a Floating Item",
+  "advancement.floating_everything.floating_floating": "Matryoshka",
+  "advancement.floating_everything.floating_floating.desc": "Float a Floating Item",
+  "advancement.floating_everything.floating_potato": "Take you to an alien",
+  "advancement.floating_everything.floating_potato.desc": "Float a Tiny Potato",
+  "advancement.floating_everything.floating_hourglass": "Tautology Doubtful",
+  "advancement.floating_everything.floating_hourglass.desc": "Float a Hovering Hourglass",
+
+  "floating_everything.entry.floatingItems": "Floating Items",
+  "botania.page.floatingItems0": "By putting 8 of any identical item into a $(l:basics/rune_altar)$(item)Runic Altar$(0)$(/l) along with a $(l:misc/shiny_flowers)$(item)Floating Mystical Flower$(0)$(/l) and a $(item)Redstone Root$(0), and supplying a fair amount of $(thing)mana$(0), you can $(thing)float$(0) any item in place of a mystical flower.$(p)Just like regular $(l:misc/shiny_flowers)$(item)floating flowers$(0)$(/l), you can change its appearance by right-clicking it with $(l:tools/grass_seeds)$(item)grass seeds$(0)$(/l) or a $(item)snowball$(0).",
+  "botania.page.floatingItems1": "$(item)Floating Items$(0) don't just float there. Like $(item)functional flowers$(0), they draw $(thing)mana$(0) from nearby $(l:mana/pool)$(item)Mana Pool$(0)$(/l) and imitate the click action of the item they hold.$(p)For example, they can place blocks, attack enemies with a sword, or pat a $(item)Tiny Potato$(0).$(p)Each click consumes $(thing)mana$(0).",
+  "botania.page.floatingItems2": "The item held by a $(item)Floating Item$(0) is not consumed, but it is kept in its current state by spending $(thing)mana$(0).$(p)For example, if the sword it holds takes damage, it will have to pay additional $(thing)mana$(0). If the item is lost completely, such as by breaking, it will have to pay even more $(thing)mana$(0).$(p)You don't need to provide this additional $(thing)mana$(0) in advance, but the next action will be skipped until it has been paid off.",
+  "botania.page.floatingItems3": "Floating Item",
+  "botania.page.floatingItems4": "The type and interval of the click a $(item)Floating Item$(0) imitates depend on its island type.$(p)$(li)Snow: right-click every 40 ticks$(li)Grass: right-click every 20 ticks$(li)Podzol: sneak-right-click every 20 ticks$(li)Mycelium: left-click every 20 ticks$(li)Dry: right-click every 10 ticks$(li)Golden: sneak-right-click every 10 ticks",
+  "botania.page.floatingItems5": "$(li)Vivid: left-click every 10 ticks$(li)Scorched: right-click every tick$(li)Infused: sneak-right-click every tick$(li)Mutated: left-click every tick$(p)You can also stop the clicking by a redstone signal.",
+  "botania.page.floatingItems6": "A $(item)Floating Item$(0) will normally try to click the block below it, but it cannot click a block that has an $(l:devices/platform)$(item)Abstruse Platform$(0)$(/l) placed on it.$(p)If there is an $(l:devices/platform)$(item)Abstruse Platform$(0)$(/l) below, it tries north next, then east, then south, west, and finally above in the same way. If every direction has one, it gives up on clicking altogether."
 }

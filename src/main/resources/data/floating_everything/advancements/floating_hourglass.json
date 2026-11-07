@@ -1,0 +1,38 @@
+{
+    "parent": "floating_everything:floating_item",
+    "criteria": {
+        "obtain": {
+            "trigger": "minecraft:inventory_changed",
+            "conditions": {
+                "items": [
+                    {
+                        "items": [
+                            "floating_everything:floating_item"
+                        ],
+                        "nbt": "{BlockEntityTag:{displayed_item:{id:\"botania:hourglass\", Count:1b}}}"
+                    }
+                ]
+            }
+        }
+    },
+    "display": {
+        "announce_to_chat": true,
+        "description": {
+            "translate": "advancement.floating_everything.floating_hourglass.desc"
+        },
+        "icon": {
+            "count": 1,
+            "item": "floating_everything:floating_item",
+            "nbt": "{BlockEntityTag:{displayed_item:{id:\"botania:hourglass\", Count:1b}}}"
+        },
+        "show_toast": true,
+        "title": {
+            "translate": "advancement.floating_everything.floating_hourglass"
+        }
+    },
+    "requirements": [
+        [
+            "obtain"
+        ]
+    ]
+}

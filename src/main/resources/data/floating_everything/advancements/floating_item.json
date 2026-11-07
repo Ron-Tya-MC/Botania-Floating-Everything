@@ -1,0 +1,36 @@
+{
+    "parent": "floating_everything:root",
+    "criteria": {
+        "obtain": {
+            "trigger": "minecraft:inventory_changed",
+            "conditions": {
+                "items": [
+                    {
+                        "items": [
+                            "floating_everything:floating_item"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "display": {
+        "announce_to_chat": true,
+        "description": {
+            "translate": "advancement.floating_everything.floating_item.desc"
+        },
+        "icon": {
+            "count": 1,
+            "item": "floating_everything:floating_item"
+        },
+        "show_toast": true,
+        "title": {
+            "translate": "advancement.floating_everything.floating_item"
+        }
+    },
+    "requirements": [
+        [
+            "obtain"
+        ]
+    ]
+}

@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -132,7 +133,11 @@ public class FloatingItemClicker {
         }
         Vec3 hitPos = new Vec3(target.getX() + 0.5, target.getY() + 1.0, target.getZ() + 0.5);
         BlockHitResult hit = new BlockHitResult(hitPos, Direction.UP, target, false);
-        return player.gameMode.useItemOn(player, level, held, InteractionHand.MAIN_HAND, hit).consumesAction();
+        InteractionResult blockResult = player.gameMode.useItemOn(player, level, held, InteractionHand.MAIN_HAND, hit);
+        if (blockResult != InteractionResult.PASS) {
+            return blockResult.consumesAction();
+        }
+        return player.gameMode.useItem(player, level, player.getItemInHand(InteractionHand.MAIN_HAND), InteractionHand.MAIN_HAND).consumesAction();
     }
 
     private static boolean leftClick(ServerLevel level, FloatingFakePlayer player, BlockPos target, MiningProgress miningProgress) {

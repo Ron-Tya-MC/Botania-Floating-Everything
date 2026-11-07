@@ -1,0 +1,36 @@
+{
+    "name": "floating_everything.entry.floatingItems",
+    "category": "botania:misc",
+    "icon": "floating_everything:floating_item",
+    "pages": [
+        {
+            "type": "text",
+            "text": "botania.page.floatingItems0"
+        },
+        {
+            "type": "botania:runic_altar",
+            "title": "botania.page.floatingItems3",
+            "recipe": "floating_everything:floating_item_example"
+        },
+        {
+            "type": "text",
+            "text": "botania.page.floatingItems1"
+        },
+        {
+            "type": "text",
+            "text": "botania.page.floatingItems6"
+        },
+        {
+            "type": "text",
+            "text": "botania.page.floatingItems4"
+        },
+        {
+            "type": "text",
+            "text": "botania.page.floatingItems5"
+        },
+        {
+            "type": "text",
+            "text": "botania.page.floatingItems2"
+        }
+    ]
+}
